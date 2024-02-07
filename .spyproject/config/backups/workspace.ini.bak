@@ -1,0 +1,12 @@
+[workspace]
+restore_data_on_startup = True
+save_data_on_exit = True
+save_history = True
+save_non_project_files = False
+project_type = 'empty-project-type'
+recent_files = ['CAS_Recreation.py', 'CAS_XrayFinder.py', 'CAS_ParameterGUI.py', 'TEST.py', '..\\..\\..\\..\\.conda\\envs\\spyder-cf\\lib\\site-packages\\picosdk\\functions.py', 'Picolog1000.py', '..\\..\\..\\..\\.conda\\envs\\spyder-cf\\lib\\site-packages\\picosdk\\discover.py', '..\\..\\..\\..\\.conda\\envs\\spyder-cf\\lib\\site-packages\\picosdk\\library.py', '..\\..\\..\\..\\.conda\\envs\\spyder-cf\\lib\\site-packages\\picosdk\\ps2000.py', '..\\..\\..\\..\\.conda\\envs\\spyder-cf\\lib\\ctypes\\__init__.py']
+
+[main]
+version = 0.2.0
+recent_files = []
+
