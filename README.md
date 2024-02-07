@@ -1,5 +1,5 @@
 # X-Ray-Fluorescence
-Python Code for a GUI that allows for the analysis of X-Ray Fluorescence events for .raw and .tiff filetypes  
+Spyder Project Python Code files for a GUI that allows for the analysis of X-Ray Fluorescence events for .raw and .tiff filetypes  
 
 # Capabilities
 - Allows the creation of a Dark Frame from a CMOS based sensor [Will create an averaged frame from a directory of either .raw or .tiff dark frames].
