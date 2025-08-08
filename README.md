@@ -8,4 +8,9 @@ Spyder Project Python Code files for a GUI that allows for the analysis of X-Ray
 - Custom Region of Interest (ROI's) and search parameters for identifying and troubleshooting different areas of the CMOS sensor.
 
 # How To Use
-Run the CAS_Recreation.py script. This will open the GUI.
+Run the CAS_Recreation.py script to open the GUI. E.g.
+```
+python3 CAS_Recreation.oy
+```
+
+You can then select a background dark frame and then a data folder with event-data frames in it. You must set your calibration/configuration before this (i.e., device size in pixels, and a region-of-interest [ROI]).
