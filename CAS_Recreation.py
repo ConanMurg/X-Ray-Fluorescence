@@ -12,7 +12,6 @@ Requires installation of a few modules:
  - glob
  - natsorted
 """
-from mttkinter import mtTkinter as tkr
 import logging
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename as askf
@@ -25,23 +24,24 @@ import glob
 from threading import Thread, Event
 from functools import partial
 from queue import Queue
+import pathlib
 from natsort import natsorted
 from scipy.stats import norm
 import numpy as np
+from mttkinter import mtTkinter as tkr
 from matplotlib.figure import (Figure, SubplotParams)
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.widgets import MultiCursor
-import matplotlib.ticker as ticker
-import matplotlib.pyplot as plt
-import pathlib
+from matplotlib import ticker
+from matplotlib import pyplot as plt
 from tifffile import imread
 from darkframegui import DFWindow  ######
 from hotpixelgui import HPWindow   ######
-from CAS_ParameterGUI import ParamsWindow ######
 from calibgui import CalibWindow   ######
-# from xray_finder import xrf_analysis #####
-from CAS_XrayFinder import xrf_analysis #####
+from CAS_XrayFinder import xrf_analysis   #####
+from CAS_ParameterGUI import ParamsWindow ######
+
 
 __all__ = ['Parameters', 'MyWindow', 'Startup']
 
@@ -101,7 +101,7 @@ class Parameters:
         self.cx = 165
         self.cy = 320
         self.r = 58
-        
+
     @property
     def rows(self):
         """
@@ -199,7 +199,7 @@ class Parameters:
         only the left half or right half of the image.
         """
         return self.__LR
-    
+
     @LR.setter
     def LR(self, val):
         if val in ["All", "Left", "Right", "LL", "ML", "MR", "RR"]:
@@ -226,12 +226,12 @@ class Parameters:
         Returns searchgrid size. 3x3, 5x5, or 7x7
         """
         return self.__sg_size
-    
+
     @sg_size.setter
     def sg_size(self, val):
         if val in ["3x3", "5x5", "7x7"]:
             self.__sg_size = val
-            
+
     @property
     def cx(self):
         """
@@ -247,14 +247,13 @@ class Parameters:
         if value > 0 and isinstance(value, int):
             self.__cx = value
 
-
     @property
     def cy(self):
         """
         Returns scale value.
         """
         return self.__cy
-    
+
     @cy.setter
     def cy(self, value):
         """
@@ -345,41 +344,45 @@ class MyWindow:
 
 
         # Create buttons
-        self.button_create_hp = tkr.Button(win, command = lambda: self.hp_gui(win), bg='darkseagreen')
-        self.button_create_hp.config(text='Create Hot Pixel Map', width=20)      # Hot Pixel Map
+        self.button_create_hp = tkr.Button(win, command = lambda: self.hp_gui(win),
+                                           bg='darkseagreen')
+        self.button_create_hp.config(text='Create Hot Pixel Map', width=20)  # Hot Pixel Map
 
-        self.button_create_df = tkr.Button(win, command = lambda: self.df_gui(win), bg='darkseagreen')
-        self.button_create_df.config(text='Create Dark Frame', width=20)         # Dark Frame
+        self.button_create_df = tkr.Button(win, command = lambda: self.df_gui(win),
+                                           bg='darkseagreen')
+        self.button_create_df.config(text='Create Dark Frame', width=20)     # Dark Frame
 
         self.button_hist_df = tkr.Button(win, command = self.hist_dark)
-        self.button_hist_df.config(text='Histogram Frame', width=20)             # Histogram Dark Frame
+        self.button_hist_df.config(text='Histogram Frame', width=20)         # Histogram Dark Frame
 
         self.button_hist_sub = tkr.Button(win, command = self.image_subtracted)
-        self.button_hist_sub.config(text='Dark Subtracted Frame', width=20)      # Dark Subtracted Frame
+        self.button_hist_sub.config(text='Dark Subtracted Frame', width=20)  # Dark Subtracted Frame
 
-        self.button_hist_save = tkr.Button(win, command = self.change_save, bg='lightsteelblue')
-        self.button_hist_save.config(text='Enable Save Histogram', width=20)     # Enable Save Histogram
+        self.button_hist_save = tkr.Button(win, command = self.change_save,
+                                           bg='lightsteelblue')
+        self.button_hist_save.config(text='Enable Save Histogram', width=20) # Enable Save Histogram
 
         self.button_load_df = tkr.Button(win, command = self.darkframe)
-        self.button_load_df.config(text='Select Dark Frame', width = 20)         # Select Dark Frame
+        self.button_load_df.config(text='Select Dark Frame', width = 20)     # Select Dark Frame
 
         self.button_load_hp = tkr.Button(win, command = self.load_hot_pixel_map)
-        self.button_load_hp.config(text='Select Hot Pixel Map', width=20)        # Select Hot Pixel Map
+        self.button_load_hp.config(text='Select Hot Pixel Map', width=20)    # Select Hot Pixel Map
 
         self.button_data = tkr.Button(win, command = self.sample_data)
-        self.button_data.config(text='Sample Data (FWHM)', width=20)             # Sample Data File
+        self.button_data.config(text='Sample Data (FWHM)', width=20)         # Sample Data File
 
         self.button_datas = tkr.Button(win,command = lambda: self.check_params(win))
-        self.button_datas.config(text='Choose X-Ray Frames', width=20)           # Start analysis
+        self.button_datas.config(text='Choose X-Ray Frames', width=20)       # Start analysis
 
-        self.button_quit = tkr.Button(win, command = lambda: self.confirm_exit(win), bg='lightcoral')
-        self.button_quit.config(text = 'Quit', width = 20)                       # Quit
+        self.button_quit = tkr.Button(win, command = lambda: self.confirm_exit(win),
+                                      bg='lightcoral')
+        self.button_quit.config(text = 'Quit', width = 20)                   # Quit
 
         self.button_params = tkr.Button(win, command = lambda: self.params_gui(win, self.params))
-        self.button_params.config(text='Update Parameters', width = 20)          # Update Params
+        self.button_params.config(text='Update Parameters', width = 20)      # Update Params
 
         self.button_calibration = tkr.Button(win, command = lambda: self.calib_gui(win))
-        self.button_calibration.config(text="Calibration", width=20)             # Calibration GUI
+        self.button_calibration.config(text="Calibration", width=20)         # Calibration GUI
         self.button_calibration.grid(row=14, column = 2, padx=5, pady=5)
 
         # Create text labels
@@ -508,11 +511,36 @@ class MyWindow:
 
 
     def change_save(self):
+        """
+        Changes save histogram setting from on to off or vica versa.
+
+        Returns
+        -------
+        None.
+
+        """
         self.save_hist_param = not self.save_hist_param
         print(self.save_hist_param)
 
 
     def image_subtracted(self):
+        """
+        Create image of dark subtracted frame
+
+        Raises
+        ------
+        ValueError
+            DESCRIPTION.
+        FileNotFoundError
+            DESCRIPTION.
+        RuntimeWarning
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        """
         if self.stop_plot:
             return
 
@@ -524,29 +552,30 @@ class MyWindow:
 
             if not filename:
                 raise FileNotFoundError
-                
-            
+
+
             path = pathlib.Path(filename)
 
             if path.suffix == ".raw":
                 arr = np.memmap(filename, dtype='>u2').astype(int)
-                arr = arr.reshape((self.params.rows, self.params.cols))
-                arr = arr.flatten()
-            
 
             arr = np.subtract(arr, dark)
-            
+
             # arr[blank[blank>0].tolist()] == 0
             # arr = arr * 5993/345 / 3.65 * 10
 
             if not arr.any():
                 raise RuntimeWarning
 
-            if path.suffix == ".tiff":
-                self.plot_hist(arr, nr_bins= 5993/345 / 3.65 * 10, xmin=np.amin(arr), xmax=4100* 5993/345 / 3.65 * 10, sample=True,
-                               string="Histogram of Pixel Values from Dark Subtracted Frames (BSI Non-OBF)") # Create histogram of data [Display on frame]
+            if path.suffix == ".tiff": # Create histogram of data [Display on frame]
+                self.plot_hist(arr, nr_bins= 5993/345 / 3.65 * 10,
+                               xmin=np.amin(arr), xmax=4100* 5993/345 / 3.65 * 10,
+                               sample=True,
+                               string="Histogram of Pixel Values from"
+                                      "Dark Subtracted Frames (BSI Non-OBF)")
                 if self.plot_select:
-                    self.show_pic(arr.reshape(x.shape), [0, 20])
+                    self.show_pic(arr.reshape((self.params.rows, self.params.cols)),
+                                  [0, 20])
 
 
             else: # if .raw
@@ -566,40 +595,58 @@ class MyWindow:
 
 
     def hist_dark(self):
-        x = self.params.dark
-        x = x.reshape((self.params.rows, self.params.cols))
+        """
+        Create histogram of dark frame.
+
+        Raises
+        ------
+        ValueError
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        """
+        xdark = self.params.dark
+        xdark = xdark.reshape((self.params.rows, self.params.cols))
 
         try:
             index2 =  ["Left", "Right", "LL", "ML", "MR", "RR", "All"].index(self.params.LR)
 
-        except: pass
+        except Exception as err:
+            logging.exception(err)
 
         else:
             LRlist1 = [2, 2, 4, 4, 4, 4]
             LRlist2 = [0, 1, 0, 1, 2, 3]
-            if index2 != 6: x = np.split(x, LRlist1[index2], axis=1)[LRlist2[index2]]
+            if index2 != 6:
+                xdark = np.split(xdark, LRlist1[index2], axis=1)[LRlist2[index2]]
 
 
         try:
             index3 =  ["Q1-Q3", "Q1", "Q2", "Q3", "Q4", "All"].index(self.params.roi)
 
-        except: pass
+        except Exception as err:
+            logging.exception(err)
 
         else:
             list1 = [0, 0, 1, 2, 3, 4]
             list2 = [3, 1, 2, 3, 4, 5]
-            if index3 != 5: x = np.concatenate(np.split(x, 4)[list1[index3]:list2[index3]])
-                
+            if index3 != 5:
+                xdark = np.concatenate(np.split(xdark, 4)[list1[index3]:list2[index3]])
+
         # print(f'rows: {x.shape[0]}, cols: {x.shape[1]}')
         # plt.imshow(x, interpolation = None, cmap='hot', vmin=0, vmax=4095)
-        # plt.savefig(f"C:/Users/Conan/OneDrive - University of Leicester/CIS/Non-OBF 15C/CIS_Non_OBF_{self.params.roi}_Image.png",
+        # plt.savefig(f"C:/Users/Conan/OneDrive - University of Leicester/"
+        # "CIS/Non-OBF 15C/CIS_Non_OBF_{self.params.roi}_Image.png",
         #             bbox_inches='tight')
 
 
         try:
             self.fig.clear()    # Clear previous figure
             p = self.fig.gca()  # Find the subplot axes
-            data = np.array(x).flatten()
+            data = np.array(xdark).flatten()
 
             if len(data) == 0:
                 raise ValueError
@@ -608,23 +655,24 @@ class MyWindow:
             xmax = np.amax(data)
             nr_bins = 1
             if self.plot_select:
-                n, bins, patches = p.hist(data, bins=np.arange(xmin, xmax+nr_bins, nr_bins), 
-                                          facecolor='green', alpha=0.75, density=0)
-    
+                n, bins = p.hist(data, bins=np.arange(xmin, xmax+nr_bins, nr_bins),
+                                          facecolor='green', alpha=0.75, density=0)[0:2]
+
                 p.set_xlim(xmin, xmax)
                 p.set_ylim(0, 1.01*np.max(n))
                 self.fig.supxlabel("Pixel Value (ADU)")
                 self.fig.supylabel("Frequency (%)")
                 self.fig.suptitle("Histogram of Pixel Values (ADU)")
-            
+
             else:
                 data = data * 5993/345 / 3.65 * 10
                 nr_bins = 5993/345 / 3.65 * 10
                 xmin = np.amin(data)
                 xmax = np.amax(data)
-                n, bins, patches = p.hist(data, bins=np.arange(xmin, xmax+nr_bins, nr_bins), 
-                                          facecolor='green', alpha=0.75, density=0, cumulative=0)
-                if xmin < 0.1: xmin = 0.1
+                n, bins = p.hist(data, bins=np.arange(xmin, xmax+nr_bins, nr_bins),
+                                          facecolor='green', alpha=0.75, density=0,
+                                          cumulative=0)[0:2]
+                xmin = max(xmin, 0.1) # Sets xmin to 0.1 if less than 0.1
                 # p.set_xlim(xmin, xmax)
                 # p.set_ylim(0.0015, 1.01*np.max(n))
                 p.set_xlim(np.amin(bins), np.amax(bins))
@@ -635,13 +683,13 @@ class MyWindow:
                 self.fig.supylabel("Cumulative Frequency (%)")
                 self.fig.suptitle("Cumulative Histogram of Pixel Values (ADU)")
 
-            
+
             p.grid(True)        # Overlay grid
-            
+
 
             # if self.plot_select:
             #     scale_x = 930 / 510 / 3.65 # / 0.0194
-            
+
             # scale_x = 1
 
             # if scale_x != 1:
@@ -654,18 +702,18 @@ class MyWindow:
 
             self.canvas.draw()  # Update the canvas
             # self.fig.savefig("TESTINGSAVEFUNCTON")
-            
+
             if self.save_hist_param is True:
                 print("Attempting Save")
                 c=[bins, n]
                 save_hist_data = askfs(filetypes=[("txt", ".txt")], defaultextension=".txt")
                 if save_hist_data == '':
                     return
-                else:
-                    with open(save_hist_data, "w") as file:
-                        for x in zip(*c):
-                            file.write("{0}\t{1}\n".format(*x))
-            
+                with open(save_hist_data, "w",  encoding='UTF-8') as file:
+                    for _ in zip(*c):
+                        file.write(f"{_[0]}\t{_[1]}\n")
+                        # file.write("{0}\t{1}\n".format(*_))
+
 
         except TypeError:
             self.update_console("plot_hist function failed.")
@@ -702,14 +750,14 @@ class MyWindow:
         self.update_console(f'Number of Files: {len(self.data_sp)}')
         self.update_console(f'Number of events in window: {len(e)}.')
 
-        pixel_size = self.params.pixel_size
-        int_time = self.params.int_time
-        pixel_area	= pixel_size * pixel_size # cm^2
-        x1, x2, y1, y2 = self.params.searchgrid
-        ROI = (x2-x1)*(y2-y1) # Pixels
-        roi_area = ROI*pixel_area # cm^2
+        # pixel_size = self.params.pixel_size
+        # int_time = self.params.int_time
+        # pixel_area	= pixel_size * pixel_size # cm^2
+        # x1, x2, y1, y2 = self.params.searchgrid
+        # ROI = (x2-x1)*(y2-y1) # Pixels
+        # roi_area = ROI*pixel_area # cm^2
         # self.update_console(f'ROI: {roi_area}')
-        t = len(e) / (int_time * len(self.data_sp) / 1000) / roi_area
+        # t = len(e) / (int_time * len(self.data_sp) / 1000) / roi_area
         # self.update_console(f'Counts /s /cm: {t}')
 
 
@@ -735,6 +783,10 @@ class MyWindow:
                 writer.writerows(self.parameters)
                 writer.writerows(self.data_mp)
                 writer.writerows(self.data_sp)
+
+        except FileNotFoundError:
+            self.update_console("Failed to save data")
+            print("Failed to save data")
 
         except Exception as err:
             logging.exception(err)
@@ -974,11 +1026,12 @@ class MyWindow:
             if self.plot_select:
                 if len(self.energy_sp) != 0:
                     string = (f'Histogram of Single Pixel Energy: {self.params.element}')
-                        
+
                     # self.plot_hist(self.energy_sp, nr_bins=1, xmin=0, xmax=2000, sample=False,
                     #                 string="Histogram of Single Pixel Energies (BSI Non-OBF)",
                     #                 save=self.save_hist_param)
-                    self.plot_line(self.energy_sp, nr_bins=1, string="Histogram of Single Pixel Values")
+                    self.plot_line(self.energy_sp, nr_bins=1,
+                                   string="Histogram of Single Pixel Values")
             else:
                 if len(self.energy_mp) != 0:
                     string = (f'Histogram of Multi Pixel Energy: {self.params.element}')
@@ -1236,13 +1289,15 @@ class MyWindow:
                                [self.params.dir_filenames]]
 
             parameters = [rows, cols, searchgrid, threshold, sec_threshold, dark, hot_pixels]
-            self.file_view = partial(self.data_viewer, files=filenames, params=[rows,cols,searchgrid,hot_pixels])
-            self.worker=Thread(target=xrf_analysis, args=(filenames, self.queue_time, 
-                                                          self.queue_data, self.event, 
+            self.file_view = partial(self.data_viewer, files=filenames,
+                                     params=[rows,cols,searchgrid,hot_pixels])
+            self.worker=Thread(target=xrf_analysis, args=(filenames, self.queue_time,
+                                                          self.queue_data, self.event,
                                                           parameters, self.is_tiff_file,
                                                           self.params.roi, self.params.LR,
                                                           self.params.scale, self.params.sg_size,
-                                                          self.params.cx, self.params.cy, self.params.r))
+                                                          self.params.cx, self.params.cy,
+                                                          self.params.r))
             self.worker.start()
             self.after_id = None
             self.time_frame.after(1, self.update_time_display)
@@ -1260,7 +1315,8 @@ class MyWindow:
         """
         stop = 0
         if not self.queue_time.empty():
-            elaps, remain, percent, energy_sp, energy_mp, stop = self.queue_time.get() # Get values from Queue()
+            # Get values from Queue()
+            elaps, remain, percent, energy_sp, energy_mp, stop = self.queue_time.get()
 
             self.elapsedtime["state"] = 'normal'    # Elapsed Time
             self.elapsedtime.delete('1.0',   tkr.END)
@@ -1369,10 +1425,10 @@ class MyWindow:
                 self.update_console(f"Imported Hot Pixel Map. Nr: {len(self.params.hot_pixels)}")
                 rows = self.params.rows
                 cols = self.params.cols
-                x = np.zeros((rows*cols), dtype=np.int32)
-                x[self.params.hot_pixels] = 1
-                x = np.reshape(x, (rows, cols))
-                self.show_pic(x, v=[0,1])
+                xarr = np.zeros((rows*cols), dtype=np.int32)
+                xarr[self.params.hot_pixels] = 1
+                xarr = np.reshape(xarr, (rows, cols))
+                self.show_pic(xarr, v=[0,1])
 
             except IndexError:
                 self.update_console("Hot Pixel List has out of bound coordinates")
@@ -1465,9 +1521,9 @@ class MyWindow:
         data = np.array(arr).flatten()
         nr_events = len(data)
         # data = data[data > 3*self.params.sec_threshold]
-        y = np.histogram(data, bins=np.arange(0, np.max(data)+nr_bins, nr_bins))[0]
-        c=[np.arange(0, np.max(data)+nr_bins, nr_bins), y]
-        p.plot(y, marker='o', markersize=2)
+        yarr = np.histogram(data, bins=np.arange(0, np.max(data)+nr_bins, nr_bins))[0]
+        c = [np.arange(0, np.max(data)+nr_bins, nr_bins), yarr]
+        p.plot(yarr, marker='o', markersize=2)
 
         xlims = [0, 750]
         p.set_xlim(xlims)
@@ -1514,14 +1570,15 @@ class MyWindow:
             save_hist_data = askfs(filetypes=[("txt", ".txt")], defaultextension=".txt")
             if save_hist_data == '':
                 return
-            else:
-                with open(save_hist_data, "w") as file:
-                    for x in zip(*c):
-                        file.write("{0}\t{1}\n".format(*x))
-        
+            with open(save_hist_data, "w", encoding='UTF-8') as file:
+                for _ in zip(*c):
+                    file.write(f"{_[0]}\t{_[1]}\n")
+                    # file.write("{0}\t{1}\n".format(*x))
 
 
-    def plot_hist(self, arr, nr_bins=1, string=None, xmin=None, xmax=None, sample=False, save=False, log=False):
+
+    def plot_hist(self, arr, nr_bins=1, string=None, xmin=None,
+                  xmax=None, sample=False, save=False, log=False):
         """
         Create histogram of imported data
 
@@ -1562,29 +1619,30 @@ class MyWindow:
             if xmax is None:
                 xmax = np.amax(data)
 
-            if sample is True:
+            # if sample is True:
                 # xmin = np.amin(data)
                 # xmax = np.amax(data)
                 # xlims = [-100, 100]
-                xlims = [xmin, xmax]
+                # xlims = [xmin, xmax]
                 # xlims = [400, 4095]
 
-            n, bins, patches = p.hist(data, bins=np.arange(xmin, xmax+nr_bins, nr_bins), facecolor='green', alpha=0.75, density=0)
+            n, bins = p.hist(data, bins=np.arange(xmin, xmax+nr_bins, nr_bins),
+                             facecolor='green', alpha=0.75, density=0)[0:2]
             # xlims[0]= 100
 
             if np.amin(data) < 1:
                 xm = 1
 
-            else: 
+            else:
                 xm = np.amin(data)
-            
+
 
             if log is True:
                 p.set_xlim(xm, np.amax(data))
                 # print(np.amin(data))
                 # rescale y
                 p.set_ylim(0.1, 10*np.max(n))
-                
+
                 p.set_yscale('log')
                 p.set_xscale('log')
             else:
@@ -1593,8 +1651,8 @@ class MyWindow:
                     xmax = xmin + 1
                 p.set_xlim(xmin, xmax)
                 p.set_ylim(0, 1.01*np.max(n))
-            
-            
+
+
             p.grid(True)        # Overlay grid
             if sample:
                 self.fig.supxlabel("Pixel Value (ADU)")
@@ -1610,7 +1668,7 @@ class MyWindow:
 
             if sample is False:
                 self.fig.legend([f'{len(data)}'], loc='upper right')
-            
+
             if self.plot_select:
                 scale_x = 1 # 5900/345 # 1
             else:
@@ -1619,7 +1677,7 @@ class MyWindow:
                 # scale_x = scale_x / 0.1 # Divide by exposure time to convert from /0.1s to /s
 
                 # scale_x = 930 / 510 / 3.65 # / 0.0194
-            
+
             scale_x = 1
 
             if scale_x != 1:
@@ -1631,42 +1689,42 @@ class MyWindow:
             ax2.xaxis.set_major_formatter(ticks_x)
 
             self.canvas.draw()  # Update the canvas
-            
+
             if save is True:
                 # self.fig.savefig("TESTINGSAVEFUNCTON")
                 c=[bins, n]
                 save_hist_data = askfs(filetypes=[("txt", ".txt")], defaultextension=".txt")
                 if save_hist_data == '':
                     return
-                else:
-                    with open(save_hist_data, "w") as file:
-                        for x in zip(*c):
-                            file.write("{0}\t{1}\n".format(*x))
-            
+                with open(save_hist_data, "w", encoding='UTF-8') as file:
+                    for _ in zip(*c):
+                        file.write(f"{_[0]}\t{_[1]}\n")
+                        # file.write("{0}\t{1}\n".format(*x))
+
 
         except TypeError:
             self.update_console("plot_hist function failed.")
 
         except ValueError:
-            pass
+            self.update_console("plot_hist function failed.")
 
 
     def new_and_histogram(self, arr, nr_bins=1, string=None, xmin=None, xmax=None):
         """
         Create histogram of imported data
-    
+
         Params
         ------------
-    
+
         df_data: numpy array
             The data for which we wish to create a histogram.
-    
+
         bins: int
             The number of bins we want in our histogram.
-    
+
         string: string
             The title of the histogram to display on the plot.
-    
+
         xmin, xmax, ymax: int
             The values for the range we want to plot on our histogram for the
             x-axis and y-axis
@@ -1674,50 +1732,52 @@ class MyWindow:
         try:
             self.fig.clear()    # Clear previous figure
             p = self.fig.gca()  # Find the subplot axes
-            data = np.array(arr).flatten() 
-    
+            data = np.array(arr).flatten()
+
             if len(data) == 0:
                 raise ValueError
-    
+
             if xmin is None:
                 xmin = 0
-    
+
             if xmax is None:
                 xmax = np.amax(data)
-    
-            n, bins, patches = p.hist(data, bins=np.arange(xmin, xmax+nr_bins, nr_bins), facecolor='green', alpha=0.75, cumulative=True, density=True)
-    
+
+            n, bins = p.hist(data, bins=np.arange(xmin, xmax+nr_bins, nr_bins),
+                             facecolor='green', alpha=0.75, cumulative=True,
+                             density=True)[0:2]
+
             p.set_xlim(1, np.amax(bins))
             p.set_ylim(0.5,     np.max(n))
-            
-            
+
+
             p.grid(True)        # Overlay grid
             self.fig.supxlabel("Pixel Energy (ADU)")
             self.fig.supylabel("Frequency (Counts)")
-    
+
             if string is None:
                 string = ('Histogram of X-Ray Energy')
-    
+
             self.fig.suptitle(string)
-            
+
             if self.plot_select:
                 scale_x = 1 # 5900/345 # 1
             else:
                 scale_x = 1# 930 / 510 / 3.65 # / 0.0194
-            
-    
+
+
             if scale_x != 1:
                 # self.fig.supxlabel("Dark Current (e-/pixel/s)")
                 self.fig.supxlabel("Pixel Value (KeV)")
-    
+
             ticks_x = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(np.around(x*scale_x, 3)))
             ax2 = self.fig.gca()
             ax2.xaxis.set_major_formatter(ticks_x)
             p.set_yscale('log')
             p.set_xscale('log')
-    
+
             self.canvas.draw()  # Update the canvas
-            
+
             if self.save_hist_param is True:
                 # self.fig.savefig("TESTINGSAVEFUNCTON")
                 # print("Attempting Save")
@@ -1725,15 +1785,15 @@ class MyWindow:
                 save_hist_data = askfs(filetypes=[("txt", ".txt")], defaultextension=".txt")
                 if save_hist_data == '':
                     return
-                else:
-                    with open(save_hist_data, "w") as file:
-                        for x in zip(*c):
-                            file.write("{0}\t{1}\n".format(*x))
-            
-    
+                with open(save_hist_data, "w", encoding='UTF-8') as file:
+                    for _ in zip(*c):
+                        file.write(f"{_[0]}\t{_[1]}\n")
+                        # file.write("{0}\t{1}\n".format(*x))
+
+
         except TypeError:
             self.update_console("plot_hist function failed.")
-    
+
         except ValueError:
             pass
 
@@ -1750,21 +1810,23 @@ class MyWindow:
             initdir = os.path.dirname(os.path.abspath(self.params.dir_df))
 
         try:
-            filename = askf(initialdir=initdir, 
-                            filetypes=[('All files','*.*'), ('Tiff file','*.tiff'), ('Raw file','*.raw')])
+            filename = askf(initialdir=initdir,
+                            filetypes=[('All files','*.*'),
+                                       ('Tiff file','*.tiff'),
+                                       ('Raw file','*.raw')])
             if not filename:
                 if self.params.dark.size != 1:
                     dark = self.params.dark.reshape((self.params.rows, self.params.cols))
                     if pathlib.Path(os.path.basename(self.params.dir_df)).suffix == ".tiff":
                         lims=[0, 4095]
-    
-                    else: 
+
+                    else:
                         lims=None
-    
+
                     self.show_pic(dark, v=lims)
 
                 raise FileNotFoundError
-            
+
             path = pathlib.Path(filename)
 
             if path.suffix == ".raw":
@@ -1785,7 +1847,7 @@ class MyWindow:
                 lims=[0, 4095]
                 x = imread(filename)
                 x = x[::self.params.scale, ::self.params.scale]
-                
+
 
                 self.params.rows = x.shape[0]
                 self.params.cols = x.shape[1]
@@ -1795,7 +1857,8 @@ class MyWindow:
                 try:
                     index2 =  ["Left", "Right", "LL", "ML", "MR", "RR", "All"].index(self.params.LR)
 
-                except: pass
+                except Exception as err:
+                    logging.exception(err)
 
                 else:
                     LRlist1 = [2, 2, 4, 4, 4, 4]
@@ -1807,21 +1870,22 @@ class MyWindow:
                 try:
                     index3 =  ["Q1-Q3", "Q1", "Q2", "Q3", "Q4", "All"].index(self.params.roi)
 
-                except: pass
+                except Exception as err:
+                    logging.exception(err)
 
                 else:
                     list1 = [0, 0, 1, 2, 3, 4]
                     list2 = [3, 1, 2, 3, 4, 5]
                     if index3 != 5: x = np.concatenate(np.split(x, 4)[list1[index3]:list2[index3]])
-                
+
                 # Ratio of Bloom to Average Region
                 dim = int(2048 / int(self.params.scale))
                 v1 = np.mean(dark.reshape((dim, dim))[256:268, 0:11])
                 v2 = np.mean(dark.reshape((dim, dim))[256:268, 500:511])
                 self.update_console(f'Ratio of Bloom to Avg: {np.around(v2/v1, 3)}')
-                    
-                
-            else: 
+
+
+            else:
                 raise ValueError
 
             self.params.dark = dark
@@ -1829,7 +1893,7 @@ class MyWindow:
             self.show_pic(x, v=lims)
             self.update_console(f'Mean: {np.around(np.mean(self.params.dark), 1)}. '
                                 f'Std: {np.around(np.std(self.params.dark), 1)}.')
-            
+
         except FileNotFoundError:
             self.update_console("No File Chosen")
 
@@ -1849,10 +1913,10 @@ class MyWindow:
 
             if not filename:
                 raise FileNotFoundError
-                
-            
+
+
             path = pathlib.Path(filename)
-                
+
             if path.suffix == ".raw":
                 arr = np.memmap(filename, dtype='>u2').astype(int)
                 arr = arr.flatten()
@@ -1876,7 +1940,8 @@ class MyWindow:
                 try:
                     index2 =  ["Left", "Right", "LL", "ML", "MR", "RR", "All"].index(self.params.LR)
 
-                except: pass
+                except Exception as err:
+                    logging.exception(err)
 
                 else:
                     LRlist1 = [2, 2, 4, 4, 4, 4]
@@ -1891,7 +1956,8 @@ class MyWindow:
                 try:
                     index3 =  ["Q1-Q3", "Q1", "Q2", "Q3", "Q4", "All"].index(self.params.roi)
 
-                except: pass
+                except Exception as err:
+                    logging.exception(err)
 
                 else:
                     list1 = [0, 0, 1, 2, 3, 4]
@@ -1906,11 +1972,11 @@ class MyWindow:
                 arr = x.reshape(x.size).astype(int)
                 blank = blank.reshape(x.size).astype(int)
 
-            else: 
+            else:
                 raise ValueError
 
             arr = np.subtract(arr, dark)
-            arr[blank[blank>0].tolist()] == 0
+            arr[blank[blank>0].tolist()] = 0
 
             if not arr.any():
                 raise RuntimeWarning
@@ -1921,11 +1987,13 @@ class MyWindow:
             xma = np.amax(arr)
             if self.plot_select:
                 self.plot_hist(arr, nr_bins=1, xmin=xmi, xmax=xma, sample=True,
-                               string="Histogram of Pixel Values from Dark Subtracted Frames (BSI Non-OBF)",
+                               string="Histogram of Pixel Values from"
+                                      " Dark Subtracted Frames (BSI Non-OBF)",
                                save=self.save_hist_param)
             else:
-                self.new_and_histogram(arr, nr_bins=1, xmin=xmi, xmax=xma, string="New and Improved")
-            
+                self.new_and_histogram(arr, nr_bins=1, xmin=xmi, xmax=xma,
+                                       string="New and Improved")
+
 
         except FileNotFoundError:
             self.update_console("No File Chosen")
@@ -1951,36 +2019,33 @@ class MyWindow:
 
         for coords, vals in data_mp[nr]: # Multi pixels
             arr[coords] = vals
-            
+
         self.update_console(f'SP: {len(data_sp[nr])}. MP: {len(data_mp[nr])}')
         arr = arr.reshape((rows, cols))
         arr = arr[y_1:y_2+1, x_1:x_2+1]
-        
-        
+
+
         if self.is_tiff_file:
             x = imread(files[nr])
             scale = self.params.scale
             x = x[::scale, ::scale]
             data = x.reshape(x.size).astype(int)
             x = x.astype(int)
-            
+
         else:
             data = np.memmap(files[nr], '>u2').astype(int)
             x = data.reshape((self.params.rows, self.params.cols))
             data = data.reshape(data.size)
 
-
-
-        
         dark = self.params.dark.reshape(x.shape)
         x = np.subtract(x, dark)
-        
+
         # new = x
         # test = np.zeros((512, 512))
-        
+
         # for i in range(new.shape[0]):
         #     t = t_spare = new[i, :]
-            
+
         #     yhat2 = savgol_filter(t, 64, 1)
         #     yhat2 = yhat2.astype(int)
 
@@ -1999,39 +2064,43 @@ class MyWindow:
         #     new_flat = new_flat.reshape((1, -1))
 
         #     test[i,:] = new_flat
-            
+
         # test = test.astype(int)
         # data2 = test.flatten()
-        
+
         if self.is_tiff_file:
             for i in range(x.shape[0]):
-                    diff = x[i, 256:512]
-                    heights, bins= np.histogram(diff, bins = np.arange(np.amin(diff), np.amax(diff)+1, 1))
-                    heights = heights.astype(int)
-                    bins = np.delete(bins, len(bins)-1)
-                    y_values = []
-                    y_values = heights.tolist()
-                    peak_height = max(y_values)
-                    mean = bins[y_values.index(peak_height)]
-                    x[i,256:512] = x[i,256:512] - mean
-                    
+                diff = x[i, 256:512]
+                heights, bins= np.histogram(diff,
+                                            bins=np.arange(np.amin(diff),
+                                                           np.amax(diff)+1, 1))
+                heights = heights.astype(int)
+                bins = np.delete(bins, len(bins)-1)
+                y_values = []
+                y_values = heights.tolist()
+                peak_height = max(y_values)
+                mean = bins[y_values.index(peak_height)]
+                x[i,256:512] = x[i,256:512] - mean
+
             for i in range(x.shape[0]):
-                    diff = x[i, 0:256]
-                    heights, bins= np.histogram(diff, bins = np.arange(np.amin(diff), np.amax(diff)+1, 1))
-                    heights = heights.astype(int)
-                    bins = np.delete(bins, len(bins)-1)
-                    y_values = []
-                    y_values = heights.tolist()
-                    peak_height = max(y_values)
-                    mean = bins[y_values.index(peak_height)]
-                    x[i,0:256] = x[i,0:256] - mean
-            
+                diff = x[i, 0:256]
+                heights, bins= np.histogram(diff,
+                                            bins=np.arange(np.amin(diff),
+                                                           np.amax(diff)+1, 1))
+                heights = heights.astype(int)
+                bins = np.delete(bins, len(bins)-1)
+                y_values = []
+                y_values = heights.tolist()
+                peak_height = max(y_values)
+                mean = bins[y_values.index(peak_height)]
+                x[i,0:256] = x[i,0:256] - mean
+
         data2 = x.flatten()
-                
-            
+
+
         # data2 = np.subtract(data, self.params.dark)
-        
-        
+
+
 
         data = data.reshape((rows, cols))[y_1:y_2+1, x_1:x_2+1]
         data2 = data2.reshape((rows, cols))[y_1:y_2+1, x_1:x_2+1]
@@ -2040,7 +2109,7 @@ class MyWindow:
         ax2 = self.fig.add_subplot(222, sharex=ax1, sharey=ax1)
         ax3 = self.fig.add_subplot(223, sharex=ax1, sharey=ax1)
         ax4 = self.fig.add_subplot(224, sharex=ax1, sharey=ax1)
-        
+
         if self.is_tiff_file:
             maxs = [4095, 90, 45]
         else:
@@ -2085,7 +2154,7 @@ class MyWindow:
             arr = arr.reshape((rows, cols))
             arr = arr[y_1:y_2+1, x_1:x_2+1]
 
-            
+
             if self.is_tiff_file:
                 x = imread(files[nr])
                 scale = self.params.scale
@@ -2100,7 +2169,7 @@ class MyWindow:
             data = data.reshape((rows, cols))[y_1:y_2+1, x_1:x_2+1]
             data2 = data2.reshape((rows, cols))[y_1:y_2+1, x_1:x_2+1]
 
-            ext_fig, (ax1, ax2, ax3) = plt.subplots(1, 3, sharex=True, sharey=True)
+            (ax1, ax2, ax3) = plt.subplots(1, 3, sharex=True, sharey=True)[1]
             ax1.imshow(data2, interpolation = None, cmap='hot', vmin=0, vmax=90)
             ax2.imshow(arr, interpolation = None, cmap='hot', vmin=0, vmax=25)
 
@@ -2124,7 +2193,8 @@ class MyWindow:
             manager = plt.get_current_fig_manager()
             manager.window.showMaximized() # manager.full_screen_toggle()
             ax1.set_aspect(aspect=1, share=True)
-            plt.subplots_adjust(left=0.025, bottom=0.01, right=0.99, top=0.99, wspace=0.01, hspace=0.01)
+            plt.subplots_adjust(left=0.025, bottom=0.01, right=0.99, top=0.99,
+                                wspace=0.01, hspace=0.01)
             plt.show()
 
 
@@ -2137,9 +2207,10 @@ class MyWindow:
         def confirm_exit():
             win.deiconify()
             self.df_window.destroy()
-            
+
         button_quit = tkr.Button(self.df_window, text='Quit', width=50, command=confirm_exit)
-        self.df_win = DFWindow(self.df_window, win, button_quit)  # Use GUI Settings from darkframegui.py
+        # Use GUI Settings from darkframegui.py
+        self.df_win = DFWindow(self.df_window, win, button_quit)
         self.df_window.title('Dark Frame Creator')  # Select GUI name
         self.df_window.geometry("550x550+10+10") # Choose window geometry settings
         self.df_window.protocol('WM_DELETE_WINDOW', confirm_exit)
@@ -2152,7 +2223,8 @@ class MyWindow:
         """
         win.withdraw()
         self.hp_window = tkr.Toplevel() # Create New Tkinter Interface Frame (TopLevel())
-        self.hp_win = HPWindow(self.hp_window, win)  # Use GUI Settings from darkframegui.py
+        # Use GUI Settings from darkframegui.py
+        self.hp_win = HPWindow(self.hp_window, win)
         self.hp_window.title('Hot Pixel Map Creator')  # Select GUI name
         self.hp_window.geometry("420x300+10+10") # Choose window geometry settings
 
@@ -2211,8 +2283,3 @@ class Startup:
 
 if __name__ == '__main__':
     start = Startup()
-    
-    x = start.mywin.data_sp
-    y = start.mywin.data_mp
-    yy = start.mywin.energy_mp
-    xx = start.mywin.energy_sp

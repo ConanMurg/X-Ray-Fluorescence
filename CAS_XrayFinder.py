@@ -10,8 +10,8 @@ import datetime
 from functools import lru_cache
 import numpy as np
 from tifffile import imread
-from scipy.signal import savgol_filter
 
+__all__ = ['grid_search', 'xrf_analysis']
 
 @lru_cache(maxsize=100000)
 def grid_search(i: int, n: int=2048, m: int=2040, search: bool=None, size='3x3') -> tuple:
