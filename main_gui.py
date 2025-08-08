@@ -1831,7 +1831,7 @@ class Startup:
         self.window = tkr.Tk() # Create Tkinter Frame
         self.mywin = MyWindow(self.window) # Use MyWindow GUI Settings from GUI.py
         self.window.title('X-Ray Fluorescence Detector Software') # Select GUI name
-        self.window.iconbitmap('UoL.ico')
+        self.window.iconbitmap('figures/UoL.ico')
         self.window.geometry("1350x950+10+10") # Choose Window Geometry
         self.window.mainloop()
 
